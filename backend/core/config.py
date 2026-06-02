@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 # Instantiate globally so other modules can just import `settings`
 settings = Settings()
