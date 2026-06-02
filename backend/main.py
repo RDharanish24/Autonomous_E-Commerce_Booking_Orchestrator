@@ -12,4 +12,4 @@ app.include_router(router, prefix="/api/v1")
 
 @app.get("/health")
 def health_check():
-    return {"status": "Systems operational", "queue": "Redis active"}
+    return {"status": "Systems operational", "message": "Backend API is running"}
