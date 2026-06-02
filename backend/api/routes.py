@@ -1,12 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from models.schemas import OrchestratorRequest, TaskRecord, TaskStatus
+from models.schemas import OrchestratorRequest, TaskStatus
+from models.dynamodb import TaskRecord
 from tasks.worker import run_orchestration_task
 import uuid
-# Inside api/routes.py -> start_orchestration
-from services.dynamodb_service import create_task_record
-
-# ... setup record ...
-
+from services.dynamodb_service import create_task_record, get_task_record
 
 router = APIRouter()
 
@@ -22,7 +19,10 @@ async def start_orchestration(request: OrchestratorRequest):
         request=request
     )
     
-    # TODO: Save 'record' to DynamoDB here
+    # Save 'record' to DynamoDB
+    success = create_task_record(record)
+    if not success:
+        raise HTTPException(status_code=500, detail="Database failure")
     
     # 3. Fire off the background job. 
     # .delay() is Celery's magic method to push this to Redis.
@@ -33,10 +33,8 @@ async def start_orchestration(request: OrchestratorRequest):
 
 @router.get("/status/{task_id}", response_model=TaskRecord)
 async def get_task_status(task_id: str):
-    # TODO: Fetch the current state from DynamoDB
-    # If the task isn't found, raise a 404
-    pass
-
-success = create_task_record(record)
-if not success:
-    raise HTTPException(status_code=500, detail="Database failure")
+    # Fetch the current state from DynamoDB
+    record = get_task_record(task_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return record
