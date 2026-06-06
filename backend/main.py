@@ -18,6 +18,9 @@ app = FastAPI(
 app.include_router(router, prefix="/api/v1")
 app.include_router(mock_router, prefix="/api/v1")
 
+from api.websockets import router as ws_router
+app.include_router(ws_router)
+
 @app.get("/health")
 def health_check():
     return {"status": "Systems operational", "message": "Backend API is running"}

@@ -80,3 +80,40 @@ def update_task_state(
     except ClientError as e:
         print(f"[DB ERROR] Failed to update task {task_id}: {e.response['Error']['Message']}")
         return False
+
+
+def complete_task_with_decision(task_id: str, decision: dict, is_fallback: bool = False) -> bool:
+    """
+    Phase 3: Updates a task to COMPLETED (or FAILED if fallback) with the AI's
+    structured flight evaluation decision.
+
+    Args:
+        task_id: The DynamoDB partition key for the task.
+        decision: Serialized dict from FlightEvaluationDecision or FallbackDecision.
+        is_fallback: If True, sets status to FAILED instead of COMPLETED.
+
+    Returns:
+        True if the update succeeded, False otherwise.
+    """
+    status = TaskStatus.FAILED if is_fallback else TaskStatus.COMPLETED
+
+    try:
+        table.update_item(
+            Key={'task_id': task_id},
+            UpdateExpression=(
+                "SET #st = :status, "
+                "updated_at = :updated_at, "
+                "flight_evaluation = :fe"
+            ),
+            ExpressionAttributeNames={"#st": "status"},
+            ExpressionAttributeValues={
+                ":status": status.value,
+                ":updated_at": datetime.now(timezone.utc).isoformat(),
+                ":fe": decision,
+            },
+        )
+        print(f"[DB] Task {task_id} updated to {status.value} with AI decision.")
+        return True
+    except ClientError as e:
+        print(f"[DB ERROR] Failed to complete task {task_id}: {e.response['Error']['Message']}")
+        return False

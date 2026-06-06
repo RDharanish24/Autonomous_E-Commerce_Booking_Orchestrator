@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Dict, Any
+from typing import Dict, Any,Optional
 from enum import Enum
 
 class TaskStatus(str, Enum):
@@ -12,6 +12,7 @@ class TaskStatus(str, Enum):
 class OrchestratorRequest(BaseModel):
     goal: str = Field(..., example="Book a flight to NYC")
     constraints: Dict[str, Any] = Field(default_factory=dict)
+    client_id: Optional[str] = Field(default=None, description="WebSocket client ID for real-time updates")
 
 class VendorOption(BaseModel):
     vendor_id: str
