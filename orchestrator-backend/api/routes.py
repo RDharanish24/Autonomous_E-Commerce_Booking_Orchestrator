@@ -18,6 +18,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect, Query, status
 from fastapi.responses import JSONResponse
 
+# pyrefly: ignore [missing-import]
 from core.exceptions import VendorError, AIParseError
 from models.schemas import (
     OrchestrateRequest,

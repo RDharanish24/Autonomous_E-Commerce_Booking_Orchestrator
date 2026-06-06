@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     VENDOR_B_URL: str = "http://localhost:8001/api/v1/vendor-b"
     VENDOR_C_URL: str = "http://localhost:8001/api/v1/vendor-c"
 
+    VENDOR_ALPHA_URL: str = "http://localhost:8000/api/v1/mock/vendor-alpha/flights"
+    VENDOR_BETA_URL: str = "http://localhost:8000/api/v1/mock/vendor-beta/flights"
+    VENDOR_GAMMA_URL: str = "http://localhost:8000/api/v1/mock/vendor-gamma/flights"
+
     class Config:
         env_file = ".env"
         extra = "ignore"
